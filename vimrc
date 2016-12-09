@@ -1,4 +1,3 @@
-" Use Space to open/close folds
 " Initialization {{{
 set nocompatible " Should be disabled upon finding ~/.vimrc, but better safe than sorry
 filetype off " Disable for Vundle
@@ -40,6 +39,8 @@ Plugin 'justinmk/vim-sneak'
 
 Plugin 'tpope/vim-surround'
 
+Plugin 'lervag/vimtex'
+
 call vundle#end()
 " }}}
 filetype plugin indent on
@@ -79,6 +80,7 @@ nnoremap <S-tab> gg=G
 " Leader Commands {{{
 " let mapleader = "," " Rebind leader to be comma
 let mapleader = "\<Space>"
+let maplocalleader = ","
 
 " Call :noh upon hitting <leader> + space, removing highlighting from search
 nnoremap <leader><space> :noh<CR>
@@ -88,7 +90,6 @@ map <leader>n <plug>NERDTreeTabsToggle<CR>
 
 " }}}
 " Plugin settings {{{
-filetype plugin on
 " Syntastic {{{
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -101,6 +102,12 @@ let g:syntastic_check_on_wq = 0
 
 let g:syntastic_cpp_compiler = 'g++' " Set cpp compiler for syntastic to use
 let g:syntastic_cpp_compiler_options = '-std=c++11 -Wall -Wextra -pedantic'
+" }}}
+" vimtex {{{
+let g:vimtex_view_general_viewer = 'SumatraPDF'
+let g:vimtex_view_general_options
+            \ = '-reuse-instance -forward-search @tex @line @pdf'
+let g:vimtex_view_general_options_latexmk = '-reuse-instance'
 " }}}
 " }}}
 " Text/File Navigation {{{
@@ -222,9 +229,15 @@ au Filetype python match Underlined '\%<80v.\%>72v' " Underscore characters 72 -
 au filetype python 2mat ErrorMsg '\%79v.' " Highlight the 79th char in a row (max length in python)
 " }}}
 " Backups {{{
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swp//
-set undodir=~/.vim/undo//
+if has("unix")
+    set backupdir=~/.vim/backup//
+    set directory=~/.vim/swp//
+    set undodir=~/.vim/undo//
+elseif has("win32")
+    set backupdir=~/vimfiles/backup/
+    set directory=~/vimfiles/swp/
+    set undodir=~/vimfiles/undo/
+endif
 set undofile
 " }}}
 " Eventual functionality restoration {{{
