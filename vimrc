@@ -39,6 +39,8 @@ Plugin 'justinmk/vim-sneak'
 
 Plugin 'tpope/vim-surround'
 
+Plugin 'tpope/vim-repeat'
+
 Plugin 'lervag/vimtex'
 
 call vundle#end()
@@ -113,22 +115,14 @@ let g:vimtex_view_general_options_latexmk = '-reuse-instance'
 " Text/File Navigation {{{
 
 " Sneak navigation {{{
-"remap sneak to f
-nmap f <Plug>Sneak_s
-nmap F <Plug>Sneak_S
-xmap f <Plug>Sneak_s
-xmap F <Plug>Sneak_S
-omap f <Plug>Sneak_s
-omap F <Plug>Sneak_S
-
-"replace <leader>'f' with 1-char Sneak
-nmap <leader>f <Plug>Sneak_f
-nmap <leader>F <Plug>Sneak_F
-xmap <leader>f <Plug>Sneak_f
-xmap <leader>F <Plug>Sneak_F
-omap <leader>f <Plug>Sneak_f
-omap <leader>F <Plug>Sneak_F
-"replace 't' with 1-char Sneak
+"replace s with 1-char Sneak
+nmap f <Plug>Sneak_f
+nmap F <Plug>Sneak_F
+xmap f <Plug>Sneak_f
+xmap F <Plug>Sneak_F
+omap f <Plug>Sneak_f
+omap F <Plug>Sneak_F
+"replace t with 1-char Sneak
 nmap t <Plug>Sneak_t
 nmap T <Plug>Sneak_T
 xmap t <Plug>Sneak_t
@@ -143,6 +137,10 @@ set relativenumber " Have line numbers relative to your position
 set showmatch " Show opening and closing braces
 set wildmenu " Tab completion will show what other files there are
 set wrap " Wrap visually but not in buffer
+set linebreak " Only wraps at appropriate characters
+set nolist " List fucks wrapping up, so lets disable it
+
+"TODO: Make movement with wraps not retarded
 
 au FocusLost * silent! :set nornu " Disable relative number when unfocused
 au FocusGained * silent! :set rnu " Enable relative number when focused
@@ -162,6 +160,8 @@ map <C-k> <C-w>k
 " Easier line navigation
 nnoremap B 0
 nnoremap E $
+vnoremap B 0
+vnoremap E $
 " }}}
 " Normal Commands {{{
 command! W :w " :W will work as :w
@@ -189,16 +189,15 @@ set laststatus=2
 set lazyredraw " Redraw only when needed
 set noshowmode " Dont show which mode is active, lightline does that
 set showcmd " Show the command being entered
-set nolist " List fucks wrapping up, so lets disable it
 
 " Increase vertical size of split (window)
-map <UP> :winc+<CR>
+map <C-UP> :winc+<CR>
 " Decrease vertical size of split (window)
-map <DOWN> :winc-<CR>
+map <C-DOWN> :winc-<CR>
 " Increase horizontal size of split (window)
-map <LEFT> :winc<<CR>
+map <C-LEFT> :winc<<CR>
 " Decrease horizontal size of split (window)
-map <RIGHT> :winc><CR>
+map <C-RIGHT> :winc><CR>
 
 " Highlight last inserted text
 nnoremap gV `[v`]
@@ -212,7 +211,7 @@ if has("gui_running")
     endif
 endif
 
-" Use f9 and f10 to scroll tabs, use <leader>e to open a file in new tab
+" Use shift + j/k  to scroll tabs, use <leader>e to open a file in new tab
 map <F9> :tabp<CR>
 map <F10> :tabn<CR>
 map <leader>e :tabedit <c-r>=expand("%:p:h")<cr>/
