@@ -24,10 +24,16 @@ Plugin 'shawncplus/Vim-toCterm'
 
 Plugin 'itchyny/lightline.vim'
 
-Plugin 'scrooloose/syntastic'
+"Plugin 'scrooloose/syntastic'
+Plugin 'w0rp/ale'
+
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
 
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
+
+Plugin 'majutsushi/tagbar'
 
 Plugin 'mbbill/undotree'
 
@@ -64,6 +70,9 @@ set background=dark " Sets background to be dark (noshitsherlock)
 set encoding=utf-8 " Set utf-8 to support more characters
 set t_Co=256 " Set terminal-vi to use 256 colors
 
+"Set bgcolor to termina color to remove padding
+"highlight normal ctermbg=NONE 
+
 let g:lightline = {
             \ 'colorscheme': 'wombat',
             \ } " Change color of lightline to match with colorscheme
@@ -90,6 +99,13 @@ nnoremap <leader><space> :noh<CR>
 " Toggle NERDTree in all tabs
 map <leader>n <plug>NERDTreeTabsToggle<CR>
 
+" Toggle tagbar
+map <leader>b :TagbarToggle<CR>
+
+" Goto tag
+nnoremap <leader>gd <C-]>
+nnoremap <leader>gD :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+
 " }}}
 " Plugin settings {{{
 " Syntastic {{{
@@ -106,10 +122,9 @@ let g:syntastic_cpp_compiler = 'g++' " Set cpp compiler for syntastic to use
 let g:syntastic_cpp_compiler_options = '-std=c++11 -Wall -Wextra -pedantic'
 " }}}
 " vimtex {{{
-let g:vimtex_view_general_viewer = 'SumatraPDF'
-let g:vimtex_view_general_options
-            \ = '-reuse-instance -forward-search @tex @line @pdf'
-let g:vimtex_view_general_options_latexmk = '-reuse-instance'
+let g:vimtex_view_general_viewer = 'okular'
+let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
+let g:vimtex_view_general_options_latexmk = '--unique'
 " }}}
 " }}}
 " Text/File Navigation {{{
@@ -215,6 +230,10 @@ endif
 map <F9> :tabp<CR>
 map <F10> :tabn<CR>
 map <leader>e :tabedit <c-r>=expand("%:p:h")<cr>/
+
+" find tagfiles
+set tags=./tags;/
+au Filetype python set tags+=$VIRTUAL_ENV/tags
 
 " }}}
 " File settings {{{
