@@ -16,11 +16,11 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'flazz/vim-colorschemes'
 
-Plugin 'vim-scripts/hexHighlight.vim'
+"Plugin 'vim-scripts/hexHighlight.vim'
 
-Plugin 'godlygeek/tabular'
+"Plugin 'godlygeek/tabular'
 
-Plugin 'shawncplus/Vim-toCterm'
+"Plugin 'shawncplus/Vim-toCterm'
 
 Plugin 'itchyny/lightline.vim'
 
@@ -43,11 +43,14 @@ Plugin 'yggdroot/indentline'
 
 Plugin 'justinmk/vim-sneak'
 
-Plugin 'tpope/vim-surround'
-
+"Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 
 Plugin 'lervag/vimtex'
+
+"Javascript highligting
+Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
 
 call vundle#end()
 " }}}
@@ -86,7 +89,6 @@ set tabstop=4 " Set a tab to be 4 spaces large
 
 " Tab can be used anywhere on line to change indent
 nnoremap <tab> ==
-nnoremap <S-tab> gg=G
 " }}}
 " Leader Commands {{{
 " let mapleader = "," " Rebind leader to be comma
@@ -103,24 +105,12 @@ map <leader>n <plug>NERDTreeTabsToggle<CR>
 map <leader>b :TagbarToggle<CR>
 
 " Goto tag
-nnoremap <leader>gd <C-]>
+nnoremap <leader>gd <C-]> 
+" Goto tag in new tab
 nnoremap <leader>gD :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
 " Plugin settings {{{
-" Syntastic {{{
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-let g:syntastic_cpp_compiler = 'g++' " Set cpp compiler for syntastic to use
-let g:syntastic_cpp_compiler_options = '-std=c++11 -Wall -Wextra -pedantic'
-" }}}
 " vimtex {{{
 let g:vimtex_view_general_viewer = 'okular'
 let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
@@ -130,7 +120,7 @@ let g:vimtex_view_general_options_latexmk = '--unique'
 " Text/File Navigation {{{
 
 " Sneak navigation {{{
-"replace s with 1-char Sneak
+"replace f with 1-char Sneak
 nmap f <Plug>Sneak_f
 nmap F <Plug>Sneak_F
 xmap f <Plug>Sneak_f
@@ -157,14 +147,8 @@ set nolist " List fucks wrapping up, so lets disable it
 
 "TODO: Make movement with wraps not retarded
 
-au FocusLost * silent! :set nornu " Disable relative number when unfocused
-au FocusGained * silent! :set rnu " Enable relative number when focused
-
 autocmd StdinReadPre * let  s:std_in=1
 autocmd vimenter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-autocmd InsertEnter * silent! :set nornu " Disable relative number when in insert mode
-autocmd InsertLeave * silent! :set rnu " Enable relative number when in any other
 
 " Move in windows with C-<dir> instead of C-w <dir>
 map <C-h> <C-w>h  
@@ -172,11 +156,6 @@ map <C-l> <C-w>l
 map <C-j> <C-w>j
 map <C-k> <C-w>k
 
-" Easier line navigation
-nnoremap B 0
-nnoremap E $
-vnoremap B 0
-vnoremap E $
 " }}}
 " Normal Commands {{{
 command! W :w " :W will work as :w
@@ -188,7 +167,7 @@ command! W :w " :W will work as :w
 " }}}
 " Searching {{{
 set hlsearch " Highlight search matches
-set ignorecase "ignore case in searches
+set smartcase "ignore case in searches with lowercase letters
 set incsearch " Search while entering word
 " }}}
 " Folding {{{
@@ -214,9 +193,6 @@ map <C-LEFT> :winc<<CR>
 " Decrease horizontal size of split (window)
 map <C-RIGHT> :winc><CR>
 
-" Highlight last inserted text
-nnoremap gV `[v`]
-
 " Expand the window so it isn't some small shit on startup
 if has("gui_running")
     if has("unix")
@@ -238,13 +214,19 @@ au Filetype python set tags+=$VIRTUAL_ENV/tags
 " }}}
 " File settings {{{
 au Filetype make set noexpandtab " Turn of expandtab when in makefiles
+
 au Filetype vim set foldmethod=marker " Use different fold method for vimrc
 au Filetype vim set foldlevel=0 " Start with everything folded in vimrc
+
 au Filetype tex set linebreak " Don't linebreak in the middle of a word, only certain characters (Can be configured IIRC)
 au Filetype tex set nowrap " Don't wrap across lines, break the line instead, tex doesn't care if there's only one linebreak
-au Filetype tex set tw=150 " Don't let a line exceed 150 characters
-au Filetype python match Underlined '\%<80v.\%>72v' " Underscore characters 72 -> 79(72 is max length for docstr)
-au filetype python 2mat ErrorMsg '\%79v.' " Highlight the 79th char in a row (max length in python)
+au Filetype tex setlocal conceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible
+au Filetype tex set tw=80 " Don't let a line exceed 80 characters
+
+" frontend dev uses to many tabs for a 4 space tab
+au Filetype html,javascript,jsx setlocal shiftwidth=2
+au Filetype html,javascript,jsx setlocal softtabstop=2
+au Filetype html,javascript,jsx setlocal tabstop=2
 " }}}
 " Backups {{{
 if has("unix")
