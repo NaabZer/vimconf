@@ -12,9 +12,14 @@ elseif has("win32")
     call vundle#begin(path)
 endif
 
+"Plugin 'miyakogi/seiya.vim'
+
 Plugin 'gmarik/Vundle.vim'
 
-Plugin 'flazz/vim-colorschemes'
+Plugin 'godlygeek/csapprox'
+
+"Plugin 'flazz/vim-colorschemes'
+Plugin 'chriskempson/base16-vim'
 
 "Plugin 'vim-scripts/hexHighlight.vim'
 
@@ -22,7 +27,9 @@ Plugin 'flazz/vim-colorschemes'
 
 "Plugin 'shawncplus/Vim-toCterm'
 
-Plugin 'itchyny/lightline.vim'
+"Plugin 'itchyny/lightline.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
 "Plugin 'scrooloose/syntastic'
 Plugin 'w0rp/ale'
@@ -46,11 +53,20 @@ Plugin 'justinmk/vim-sneak'
 "Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 
+"Writing stuff
 Plugin 'lervag/vimtex'
+Plugin 'JamshedVesuna/vim-markdown-preview'
 
 "Javascript highligting
 Plugin 'pangloss/vim-javascript'
 Plugin 'mxw/vim-jsx'
+
+"C# and unity3d thingies
+Plugin 'OmniSharp/omnisharp-vim'
+
+"Lightline base16 colors TODO: Use something other than lightline, base16
+"color sucks
+"Plugin 'daviesjamie/vim-base16-lightline'
 
 call vundle#end()
 " }}}
@@ -59,7 +75,13 @@ filetype plugin indent on
 " Colors and Font {{{
 syntax enable " Turn on syntax highlighting
 
-silent! colorscheme molokai " Sets colorscheme
+set encoding=utf-8 " Set utf-8 to support more characters
+let base16colorspace=256
+set t_Co=256 " Set terminal-vi to use 256 colors
+"set termguicolors
+
+"silent! colorscheme base16-dracula " Sets colorscheme
+silent! colorscheme base16-apathy " Sets colorscheme
 
 if has('gui_running')
     if has("win32")
@@ -69,16 +91,36 @@ if has('gui_running')
     endif
 endif
 
-set background=dark " Sets background to be dark (noshitsherlock)
-set encoding=utf-8 " Set utf-8 to support more characters
-set t_Co=256 " Set terminal-vi to use 256 colors
+"set background=dark " Sets background to be dark (noshitsherlock)
+let g:airline_theme='base16'
+"let g:lightline = {
+"            \ 'colorscheme': 'base16',
+"            \ } " Change color of lightline to match with colorscheme
 
-"Set bgcolor to termina color to remove padding
-"highlight normal ctermbg=NONE 
+"Set bgcolor to terminal color, including transparancy
+let g:CSApprox_hook_post = [
+            \ 'highlight Normal            ctermbg=NONE',
+            \ 'highlight LineNr            ctermbg=NONE',
+            \ 'highlight SignifyLineAdd    cterm=bold ctermbg=NONE ctermfg=green',
+            \ 'highlight SignifyLineDelete cterm=bold ctermbg=NONE ctermfg=red',
+            \ 'highlight SignifyLineChange cterm=bold ctermbg=NONE ctermfg=yellow',
+            \ 'highlight SignifySignAdd    cterm=bold ctermbg=NONE ctermfg=green',
+            \ 'highlight SignifySignDelete cterm=bold ctermbg=NONE ctermfg=red',
+            \ 'highlight SignifySignChange cterm=bold ctermbg=NONE ctermfg=yellow',
+            \ 'highlight SignColumn        ctermbg=NONE',
+            \ 'highlight CursorLine        ctermbg=NONE cterm=NONE',
+            \ 'highlight CursorLineNr      ctermbg=NONE cterm=NONE',
+            \ 'highlight Folded            ctermbg=NONE cterm=bold',
+            \ 'highlight FoldColumn        ctermbg=NONE cterm=bold',
+            \ 'highlight LightlineRight_normal_tabsel_0       ctermbg=NONE cterm=NONE',
+            \ 'highlight NonText           ctermbg=NONE',
+            \ 'highlight SpellCap          ctermbg=NONE',
+            \ 'highlight SpellBad          ctermbg=NONE',
+            \ 'highlight SpellRare         ctermbg=NONE',
+            \ 'highlight SpellLocal        ctermbg=NONE',
+            \ 'highlight clear LineNr'
+            \]
 
-let g:lightline = {
-            \ 'colorscheme': 'wombat',
-            \ } " Change color of lightline to match with colorscheme
 " }}}
 " Indentation {{{
 set autoindent " Copy indentation from previous line
@@ -91,9 +133,8 @@ set tabstop=4 " Set a tab to be 4 spaces large
 nnoremap <tab> ==
 " }}}
 " Leader Commands {{{
-" let mapleader = "," " Rebind leader to be comma
-let mapleader = "\<Space>"
-let maplocalleader = ","
+let mapleader = "\<Space>" " Rebind leader to space
+let maplocalleader = "," " Leader used for vimtex
 
 " Call :noh upon hitting <leader> + space, removing highlighting from search
 nnoremap <leader><space> :noh<CR>
@@ -111,10 +152,30 @@ nnoremap <leader>gD :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
 " Plugin settings {{{
+" Airline {{{
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+" }}}
 " vimtex {{{
-let g:vimtex_view_general_viewer = 'okular'
-let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
-let g:vimtex_view_general_options_latexmk = '--unique'
+let g:vimtex_view_method = 'zathura'
+" }}}
+" Vim Markdown {{{
+let vim_markdown_preview_toggle=2
+
+"Use github flavored md if in git repo TODO check if github?
+if system('git rev-parse --is-inside-work-tree')
+    let vim_markdown_preview_github=1
+endif
+let vim_markdown_preview_github=1
+
+" }}}
+" ALE linters{{{ 
+let g:ale_linters = {
+            \ 'cs': ['OmniSharp']
+            \}
+" }}}
+" YCM {{{
+let g:ycm_seed_identifiers_with_syntax=1
 " }}}
 " }}}
 " Text/File Navigation {{{
@@ -137,10 +198,12 @@ omap T <Plug>Sneak_T
 
 " }}}
 
-set nu
-set relativenumber " Have line numbers relative to your position
+set rnu " Have line numbers relative to your position
+set nu " Show line number on current line (non relative)
+
 set showmatch " Show opening and closing braces
 set wildmenu " Tab completion will show what other files there are
+
 set wrap " Wrap visually but not in buffer
 set linebreak " Only wraps at appropriate characters
 set nolist " List fucks wrapping up, so lets disable it
@@ -158,12 +221,7 @@ map <C-k> <C-w>k
 
 " }}}
 " Normal Commands {{{
-command! W :w " :W will work as :w
-
-:command! Hex :call HexHighlight()
-:command! Nerd :NERDTreeToggle " Open NERDTree, so big
 :command! Undo :UndotreeToggle " Open Undotree, so nice
-:command! Vimrc :tabe $HOME/.vimrc " Open .vimrc with a command, so much
 " }}}
 " Searching {{{
 set hlsearch " Highlight search matches
@@ -202,9 +260,7 @@ if has("gui_running")
     endif
 endif
 
-" Use shift + j/k  to scroll tabs, use <leader>e to open a file in new tab
-map <F9> :tabp<CR>
-map <F10> :tabn<CR>
+" Use <leader>e to open a file in new tab
 map <leader>e :tabedit <c-r>=expand("%:p:h")<cr>/
 
 " find tagfiles
@@ -220,7 +276,7 @@ au Filetype vim set foldlevel=0 " Start with everything folded in vimrc
 
 au Filetype tex set linebreak " Don't linebreak in the middle of a word, only certain characters (Can be configured IIRC)
 au Filetype tex set nowrap " Don't wrap across lines, break the line instead, tex doesn't care if there's only one linebreak
-au Filetype tex setlocal conceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible
+au Filetype tex setconceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible TODO, this doesn't work :(
 au Filetype tex set tw=80 " Don't let a line exceed 80 characters
 
 " frontend dev uses to many tabs for a 4 space tab
@@ -238,10 +294,11 @@ elseif has("win32")
     set directory=~/vimfiles/swp/
     set undodir=~/vimfiles/undo/
 endif
-set undofile
+set undofile "Persistent undos is magic
 " }}}
 " Eventual functionality restoration {{{
 set backspace=2 " Forces backspace to function as normal
 set backspace=indent,eol,start " Allows backspacing across indents, end of lines and start of insertion
 " }}}
+
 
