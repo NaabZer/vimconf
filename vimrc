@@ -61,8 +61,11 @@ Plugin 'JamshedVesuna/vim-markdown-preview'
 Plugin 'pangloss/vim-javascript'
 Plugin 'mxw/vim-jsx'
 
-"C# and unity3d thingies
+" C# and unity3d thingies
 Plugin 'OmniSharp/omnisharp-vim'
+
+" Local vimrcs for projects
+Plugin 'krisajenkins/vim-projectlocal'
 
 "Lightline base16 colors TODO: Use something other than lightline, base16
 "color sucks
@@ -176,6 +179,13 @@ let g:ale_linters = {
 " }}}
 " YCM {{{
 let g:ycm_seed_identifiers_with_syntax=1
+let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+
+" Remove YCM error highlighting, ALE does this.
+let g:ycm_show_diagnostics_ui = 1
+let g:ycm_enable_diagnostic_signs = 0
+let g:ycm_enable_diagnostic_highlighting = 0
+
 " }}}
 " }}}
 " Text/File Navigation {{{
@@ -267,6 +277,8 @@ map <leader>e :tabedit <c-r>=expand("%:p:h")<cr>/
 set tags=./tags;/
 au Filetype python set tags+=$VIRTUAL_ENV/tags
 
+set conceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible
+
 " }}}
 " File settings {{{
 au Filetype make set noexpandtab " Turn of expandtab when in makefiles
@@ -276,7 +288,6 @@ au Filetype vim set foldlevel=0 " Start with everything folded in vimrc
 
 au Filetype tex set linebreak " Don't linebreak in the middle of a word, only certain characters (Can be configured IIRC)
 au Filetype tex set nowrap " Don't wrap across lines, break the line instead, tex doesn't care if there's only one linebreak
-au Filetype tex setconceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible TODO, this doesn't work :(
 au Filetype tex set tw=80 " Don't let a line exceed 80 characters
 
 " frontend dev uses to many tabs for a 4 space tab
@@ -300,5 +311,3 @@ set undofile "Persistent undos is magic
 set backspace=2 " Forces backspace to function as normal
 set backspace=indent,eol,start " Allows backspacing across indents, end of lines and start of insertion
 " }}}
-
-
