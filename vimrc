@@ -294,6 +294,14 @@ au Filetype tex set tw=80 " Don't let a line exceed 80 characters
 au Filetype html,javascript,jsx setlocal shiftwidth=2
 au Filetype html,javascript,jsx setlocal softtabstop=2
 au Filetype html,javascript,jsx setlocal tabstop=2
+
+" Templates {{{
+if has("autocmd")
+    augroup templates
+        autocmd BufNewFile *.tex 0r ~/.vim/templates/skeleton.tex
+    augroup END
+endif
+"}}}
 " }}}
 " Backups {{{
 if has("unix")
