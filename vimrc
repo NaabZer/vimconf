@@ -187,6 +187,9 @@ let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 0
 
 " }}}
+" Indentline {{{
+let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is not 2 in json and tex
+" }}}
 " }}}
 " Text/File Navigation {{{
 
@@ -281,6 +284,7 @@ set conceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impo
 
 " }}}
 " File settings {{{
+" TODO: Use ftplugin
 au Filetype make set noexpandtab " Turn of expandtab when in makefiles
 
 au Filetype vim set foldmethod=marker " Use different fold method for vimrc
@@ -289,6 +293,8 @@ au Filetype vim set foldlevel=0 " Start with everything folded in vimrc
 au Filetype tex set linebreak " Don't linebreak in the middle of a word, only certain characters (Can be configured IIRC)
 au Filetype tex set nowrap " Don't wrap across lines, break the line instead, tex doesn't care if there's only one linebreak
 au Filetype tex set tw=80 " Don't let a line exceed 80 characters
+au Filetype tex map <C-b> i\begin{}<left>
+au Filetype tex imap <C-b> \begin{}<left>
 
 " frontend dev uses to many tabs for a 4 space tab
 au Filetype html,javascript,jsx setlocal shiftwidth=2
