@@ -67,6 +67,8 @@ Plugin 'OmniSharp/omnisharp-vim'
 " Local vimrcs for projects
 Plugin 'krisajenkins/vim-projectlocal'
 
+"Grammar checking
+Plugin 'rhysd/vim-grammarous'
 "Lightline base16 colors TODO: Use something other than lightline, base16
 "color sucks
 "Plugin 'daviesjamie/vim-base16-lightline'
@@ -161,6 +163,13 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 " }}}
 " vimtex {{{
 let g:vimtex_view_method = 'zathura'
+" Add imap to create \item
+call vimtex#imaps#add_map({
+            \ 'lhs' : 'i',
+            \ 'rhs' : '\item ',
+            \ 'wrapper' : 'vimtex#imaps#wrap_environment',
+            \ 'context' : ['itemize', 'enumerate'],
+            \})
 " }}}
 " Vim Markdown {{{
 let vim_markdown_preview_toggle=2
