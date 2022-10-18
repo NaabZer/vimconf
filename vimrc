@@ -16,6 +16,9 @@ endif
 
 Plugin 'gmarik/Vundle.vim'
 
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'rdnetto/YCM-Generator'
+
 Plugin 'godlygeek/csapprox'
 
 "Plugin 'flazz/vim-colorschemes'
@@ -32,15 +35,13 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
 "Plugin 'scrooloose/syntastic'
-Plugin 'w0rp/ale'
-
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'rdnetto/YCM-Generator'
+"Plugin 'w0rp/ale'
+Plugin 'dense-analysis/ale'
 
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
 
-Plugin 'majutsushi/tagbar'
+Plugin 'preservim/tagbar'
 
 Plugin 'mbbill/undotree'
 
@@ -66,6 +67,11 @@ Plugin 'OmniSharp/omnisharp-vim'
 
 " Local vimrcs for projects
 Plugin 'krisajenkins/vim-projectlocal'
+
+" fuzzy finding
+Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plugin 'junegunn/fzf.vim'
+
 
 "Lightline base16 colors TODO: Use something other than lightline, base16
 "color sucks
@@ -153,6 +159,31 @@ nnoremap <leader>gd <C-]>
 " Goto tag in new tab
 nnoremap <leader>gD :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
+" FZF ctrl+p
+nmap <C-P> :FZF<CR>
+
+" FZF tagbar
+nmap <leader>] :Tags<CR>
+
+" FZF new tab
+:command! -bang FZFTE call fzf#run(fzf#wrap({'sink': 'tabedit'}, <bang>0))
+nnoremap <leader>e :FZFTE<CR>
+
+
+nmap <silent> <leader>h :set opfunc=NrToBinaryWithMovement<CR>g@
+vmap <silent> <leader>h :<c-u>call NrToBinaryWithMovement(visualmode())<CR>
+
+function! NrToBinaryWithMovement(type)
+    if a:type ==# 'v'
+        execute  "normal! `<v`>y"
+    elseif a:type ==# 'char'
+        execute  "normal! `[v`]y"
+    else
+        return
+    endif
+    echom Nr2Bin(@@)
+endfunction
+
 " }}}
 " Plugin settings {{{
 " Airline {{{
@@ -185,10 +216,55 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/
 let g:ycm_show_diagnostics_ui = 1
 let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 0
+let g:ycm_autoclose_preview_window_after_completion = 1
 
 " }}}
 " Indentline {{{
 let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is not 2 in json and tex
+" }}}
+" Tagbar {{{
+let g:tagbar_sort = 0
+let g:tagbar_show_linenumbers = 1
+let g:tagbar_wrap = 1
+" }}}
+" fzf {{{
+
+let s:tag_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit'}
+function! Custom_tags_sink(lines)
+    if len(a:lines) < 2
+        return
+    endif
+    let cmd = get(s:tag_action, a:lines[0], '')
+    let tagname = split(a:lines[1], ' ')[0]
+    if empty(cmd)
+        execute 'tag '.tagname
+    elseif cmd == 'ptag'
+        execute 'ptag '.tagname
+    else
+        execute cmd
+        execute 'tag '.tagname
+    endif
+endfunction
+
+:command! -bang -nargs=* Tags call fzf#vim#tags(<q-args>, fzf#vim#with_preview({'sink*': function('Custom_tags_sink'), "placeholder": "--tag {2}:{-1}:{3..}" }), <bang>0)'
+
+nmap <silent> <leader>a :set opfunc=AgWithMovement<CR>g@
+vmap <silent> <leader>a :<c-u>call AgWithMovement(visualmode())<CR>
+
+function! AgWithMovement(type)
+    if a:type ==# 'v'
+        execute  "normal! `<v`>y"
+    elseif a:type ==# 'char'
+        execute  "normal! `[v`]y"
+    else
+        return
+    endif
+    silent execute "Ag ".@@
+endfunction
+
 " }}}
 " }}}
 " Text/File Navigation {{{
@@ -254,6 +330,8 @@ set laststatus=2
 set lazyredraw " Redraw only when needed
 set noshowmode " Dont show which mode is active, lightline does that
 set showcmd " Show the command being entered
+set updatetime=750 " Make updatetime 750 ms instead of 4 s
+set ignorecase " Make tags work with unsorted tags
 
 " Increase vertical size of split (window)
 map <C-UP> :winc+<CR>
@@ -264,6 +342,10 @@ map <C-LEFT> :winc<<CR>
 " Decrease horizontal size of split (window)
 map <C-RIGHT> :winc><CR>
 
+" Make splits more logical
+set splitbelow
+set splitright
+
 " Expand the window so it isn't some small shit on startup
 if has("gui_running")
     if has("unix")
@@ -273,14 +355,22 @@ if has("gui_running")
     endif
 endif
 
-" Use <leader>e to open a file in new tab
-map <leader>e :tabedit <c-r>=expand("%:p:h")<cr>/
 
 " find tagfiles
 set tags=./tags;/
 au Filetype python set tags+=$VIRTUAL_ENV/tags
 
 set conceallevel=0 "This stupid ass standard vim thing makes wrtiting latex impossible
+
+func Nr2Bin(nr)
+    let n = a:nr
+    let r = ""
+    while n
+        let r = '01'[n % 2] . r
+        let n = n / 2
+    endwhile
+    return r
+endfunc
 
 " }}}
 " File settings {{{
