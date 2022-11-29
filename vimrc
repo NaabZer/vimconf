@@ -58,14 +58,17 @@ Plugin 'lervag/vimtex'
 Plugin 'JamshedVesuna/vim-markdown-preview'
 
 "Javascript highligting
-Plugin 'pangloss/vim-javascript'
-Plugin 'mxw/vim-jsx'
+Plugin 'yuezk/vim-js'
+Plugin 'maxmellon/vim-jsx-pretty'
 
 " C# and unity3d thingies
 Plugin 'OmniSharp/omnisharp-vim'
 
 " Local vimrcs for projects
 Plugin 'krisajenkins/vim-projectlocal'
+
+" Dart support
+Plugin 'dart-lang/dart-vim-plugin'
 
 "Lightline base16 colors TODO: Use something other than lightline, base16
 "color sucks
@@ -297,9 +300,9 @@ au Filetype tex map <C-b> i\begin{}<left>
 au Filetype tex imap <C-b> \begin{}<left>
 
 " frontend dev uses to many tabs for a 4 space tab
-au Filetype html,javascript,jsx setlocal shiftwidth=2
-au Filetype html,javascript,jsx setlocal softtabstop=2
-au Filetype html,javascript,jsx setlocal tabstop=2
+au Filetype html,javascript,jsx,dart setlocal shiftwidth=2
+au Filetype html,javascript,jsx,dart setlocal softtabstop=2
+au Filetype html,javascript,jsx,dart setlocal tabstop=2
 
 " Templates {{{
 if has("autocmd")
