@@ -275,6 +275,21 @@ function! AgWithMovement(type)
     silent execute "Ag ".@@
 endfunction
 
+" Rewrite Ag function to use global extra options
+function! CustomAg(query, ...)
+  if type(a:query) != v:t_string
+    return s:warn('Invalid query argument')
+  endif
+  let query = empty(a:query) ? '^(?=.)' : a:query
+  let args = copy(a:000)
+  let ag_opts = len(args) > 1 && type(args[0]) == v:t_string ? remove(args, 0) : ''
+  let opts_raw = get(g:, 'fzf_ag_opts', '')
+  let opts = empty(opts_raw) ? '' : join(opts_raw)
+  let command = opts.ag_opts . ' -- ' . fzf#shellescape(query)
+  return call('fzf#vim#ag_raw', insert(args, command, 0))
+endfunction
+command! -bang -nargs=* Ag call CustomAg(<q-args>, fzf#vim#with_preview(), <bang>0)
+
 " }}}
 " }}}
 " Text/File Navigation {{{
