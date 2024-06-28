@@ -45,7 +45,10 @@ Plugin 'preservim/tagbar'
 
 Plugin 'mbbill/undotree'
 
+" Git tools
 Plugin 'tpope/vim-fugitive'
+Plugin 'idanarye/vim-merginal'
+Plugin 'Shougo/vimproc.vim'
 
 Plugin 'yggdroot/indentline'
 
