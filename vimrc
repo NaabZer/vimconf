@@ -45,7 +45,10 @@ Plugin 'preservim/tagbar'
 
 Plugin 'mbbill/undotree'
 
+" Git tools
 Plugin 'tpope/vim-fugitive'
+Plugin 'idanarye/vim-merginal'
+Plugin 'Shougo/vimproc.vim'
 
 Plugin 'yggdroot/indentline'
 
@@ -72,12 +75,11 @@ Plugin 'krisajenkins/vim-projectlocal'
 Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plugin 'junegunn/fzf.vim'
 
-
 "Grammar checking
 Plugin 'rhysd/vim-grammarous'
-"Lightline base16 colors TODO: Use something other than lightline, base16
-"color sucks
-"Plugin 'daviesjamie/vim-base16-lightline'
+
+" Python
+Plugin 'jmcantrell/vim-virtualenv'
 
 call vundle#end()
 " }}}
