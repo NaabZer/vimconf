@@ -215,7 +215,9 @@ let vim_markdown_preview_github=1
 " }}}
 " ALE linters{{{ 
 let g:ale_linters = {
-            \ 'cs': ['OmniSharp']
+            \ 'cs': ['OmniSharp'],
+            \ 'c' : ['pc_lint'],
+            \ 'cpp' : ['pc_lint']
             \}
 " }}}
 " YCM {{{
@@ -235,7 +237,7 @@ let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is 
 " Tagbar {{{
 let g:tagbar_sort = 0
 let g:tagbar_show_linenumbers = 1
-let g:tagbar_wrap = 1
+let g:tagbar_wrap = 0
 " }}}
 " fzf {{{
 
@@ -345,7 +347,8 @@ set incsearch " Search while entering word
 " Folding {{{
 set foldenable " Enable folding
 set foldlevelstart=10 " Open most folds upon start
-set foldmethod=indent " Fold based on indentation
+" set foldmethod=indent 
+set foldmethod=syntax " Fold based on syntax
 set foldnestmax=10 " Maximum of 10 nested folds
 " }}}
 " Quality of Life {{{
@@ -396,6 +399,10 @@ func Nr2Bin(nr)
     endwhile
     return r
 endfunc
+
+" Turn off bell noises in windog
+set noerrorbells visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
 
 " }}}
 " File settings {{{
