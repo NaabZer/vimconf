@@ -45,7 +45,10 @@ Plugin 'preservim/tagbar'
 
 Plugin 'mbbill/undotree'
 
+" Git tools
 Plugin 'tpope/vim-fugitive'
+Plugin 'idanarye/vim-merginal'
+Plugin 'Shougo/vimproc.vim'
 
 Plugin 'yggdroot/indentline'
 
@@ -72,12 +75,11 @@ Plugin 'krisajenkins/vim-projectlocal'
 Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plugin 'junegunn/fzf.vim'
 
-
 "Grammar checking
 Plugin 'rhysd/vim-grammarous'
-"Lightline base16 colors TODO: Use something other than lightline, base16
-"color sucks
-"Plugin 'daviesjamie/vim-base16-lightline'
+
+" Python
+Plugin 'jmcantrell/vim-virtualenv'
 
 call vundle#end()
 " }}}
@@ -214,7 +216,9 @@ let vim_markdown_preview_github=1
 " }}}
 " ALE linters{{{ 
 let g:ale_linters = {
-            \ 'cs': ['OmniSharp']
+            \ 'cs': ['OmniSharp'],
+            \ 'c' : ['pc_lint'],
+            \ 'cpp' : ['pc_lint']
             \}
 " }}}
 " YCM {{{
@@ -234,7 +238,7 @@ let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is 
 " Tagbar {{{
 let g:tagbar_sort = 0
 let g:tagbar_show_linenumbers = 1
-let g:tagbar_wrap = 1
+let g:tagbar_wrap = 0
 " }}}
 " fzf {{{
 
@@ -273,6 +277,21 @@ function! AgWithMovement(type)
     endif
     silent execute "Ag ".@@
 endfunction
+
+" Rewrite Ag function to use global extra options
+function! CustomAg(query, ...)
+  if type(a:query) != v:t_string
+    return s:warn('Invalid query argument')
+  endif
+  let query = empty(a:query) ? '^(?=.)' : a:query
+  let args = copy(a:000)
+  let ag_opts = len(args) > 1 && type(args[0]) == v:t_string ? remove(args, 0) : ''
+  let opts_raw = get(g:, 'fzf_ag_opts', '')
+  let opts = empty(opts_raw) ? '' : join(opts_raw)
+  let command = opts.ag_opts . ' -- ' . fzf#shellescape(query)
+  return call('fzf#vim#ag_raw', insert(args, command, 0))
+endfunction
+command! -bang -nargs=* Ag call CustomAg(<q-args>, fzf#vim#with_preview(), <bang>0)
 
 " }}}
 " }}}
@@ -329,7 +348,8 @@ set incsearch " Search while entering word
 " Folding {{{
 set foldenable " Enable folding
 set foldlevelstart=10 " Open most folds upon start
-set foldmethod=indent " Fold based on indentation
+" set foldmethod=indent 
+set foldmethod=syntax " Fold based on syntax
 set foldnestmax=10 " Maximum of 10 nested folds
 " }}}
 " Quality of Life {{{
@@ -380,6 +400,10 @@ func Nr2Bin(nr)
     endwhile
     return r
 endfunc
+
+" Turn off bell noises in windog
+set noerrorbells visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
 
 " }}}
 " File settings {{{
