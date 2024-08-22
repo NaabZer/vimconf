@@ -22,10 +22,10 @@ endfunction
 
 call ale#linter#Define('c', {
 \   'name': 'pc_lint',
-\   'executable': 'Tools/Lint/LINT-NT.EXE',
+\   'executable': finddir('Tools', getcwd().";").'/Lint/LINT-NT.EXE',
 \   'command': 'LINT-NT.EXE +ffn -v -b std.lnt editor.lnt %s',
 \   'callback': 'ale_linters#c#pc_lint#Handle',
-\   'cwd': 'Tools/Lint',
+\   'cwd': finddir('Tools', getcwd().";").'/Lint',
 \   'output_stream': 'stdout',
 \   'lint_file': 1,
 \})

@@ -16,9 +16,6 @@ endif
 
 Plugin 'gmarik/Vundle.vim'
 
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'rdnetto/YCM-Generator'
-
 Plugin 'godlygeek/csapprox'
 
 "Plugin 'flazz/vim-colorschemes'
@@ -36,7 +33,6 @@ Plugin 'vim-airline/vim-airline-themes'
 
 "Plugin 'scrooloose/syntastic'
 "Plugin 'w0rp/ale'
-Plugin 'dense-analysis/ale'
 
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
@@ -54,8 +50,10 @@ Plugin 'yggdroot/indentline'
 
 Plugin 'justinmk/vim-sneak'
 
-"Plugin 'tpope/vim-surround'
+" Why is this dude so good at vim plugins
+Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-unimpaired'
 
 "Writing stuff
 Plugin 'lervag/vimtex'
@@ -85,6 +83,15 @@ Plugin 'rhysd/vim-grammarous'
 " Python
 Plugin 'jmcantrell/vim-virtualenv'
 
+" Linting, neccessary for PC-Lint
+Plugin 'dense-analysis/ale'
+
+" LSP
+Plugin 'prabirshrestha/vim-lsp'
+Plugin 'prabirshrestha/asyncomplete.vim'
+Plugin 'prabirshrestha/asyncomplete-lsp.vim'
+Plugin 'mattn/vim-lsp-settings'
+
 call vundle#end()
 " }}}
 filetype plugin indent on
@@ -99,6 +106,7 @@ set t_Co=256 " Set terminal-vi to use 256 colors
 
 "silent! colorscheme base16-dracula " Sets colorscheme
 silent! colorscheme base16-apathy " Sets colorscheme
+let $BAT_THEME='base16'
 
 if has('gui_running')
     if has("win32")
@@ -146,8 +154,6 @@ set shiftwidth=4 " Make an indent be 4 spaces
 set softtabstop=4 " Remove 4 spaces in sequence if found while backspacing
 set tabstop=4 " Set a tab to be 4 spaces large
 
-" Tab can be used anywhere on line to change indent
-nnoremap <tab> ==
 " }}}
 " Leader Commands {{{
 let mapleader = "\<Space>" " Rebind leader to space
@@ -217,6 +223,8 @@ let g:ale_linters = {
             \ 'c' : ['pc_lint'],
             \ 'cpp' : ['pc_lint']
             \}
+let g:ale_disable_lsp = 1
+let g:ale_open_list = 1
 " }}}
 " YCM {{{
 let g:ycm_seed_identifiers_with_syntax=1
@@ -236,6 +244,63 @@ let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is 
 let g:tagbar_sort = 0
 let g:tagbar_show_linenumbers = 1
 let g:tagbar_wrap = 0
+" }}}
+" Fugitive {{{
+if has('win32')
+    let g:fugitive_git_executable = "C:\\Users\\e1432179\\AppData\\Local\\Programs\\Git\\cmd\\git.exe"
+endif
+" }}}
+" Vim-LSP {{{
+" CCLS language server
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+let g:lsp_diagnostics_enabled = 0         " disable diagnostics support
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gs <plug>(lsp-document-symbol-search)
+    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+    nmap <buffer> gr :call LspFzf#ReferencesFzf({})<CR>
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> K <plug>(lsp-hover)
+
+    let g:lsp_format_sync_timeout = 1000
+    autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+    
+    " refer to doc to add more commands
+endfunction
+
+if executable('ccls')
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'ccls',
+      \ 'cmd': {server_info->['ccls']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.ccls'))},
+      \ 'initialization_options': {'cache': {'directory': expand('~/.cache/ccls') }},
+      \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      \ })
+endif
+
+let g:asyncomplete_auto_popup = 0
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <C-n>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<C-n>" :
+  \ asyncomplete#force_refresh()
+inoremap <expr><C-p> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+
 " }}}
 " fzf {{{
 
@@ -289,6 +354,7 @@ function! CustomAg(query, ...)
   return call('fzf#vim#ag_raw', insert(args, command, 0))
 endfunction
 command! -bang -nargs=* Ag call CustomAg(<q-args>, fzf#vim#with_preview(), <bang>0)
+
 
 " }}}
 " }}}
