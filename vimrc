@@ -90,6 +90,9 @@ Plugin 'dense-analysis/ale'
 Plugin 'prabirshrestha/vim-lsp'
 Plugin 'prabirshrestha/asyncomplete.vim'
 Plugin 'prabirshrestha/asyncomplete-lsp.vim'
+Plugin 'prabirshrestha/asyncomplete-buffer.vim'
+Plugin 'prabirshrestha/asyncomplete-file.vim'
+Plugin 'yami-beta/asyncomplete-omni.vim'
 Plugin 'mattn/vim-lsp-settings'
 
 call vundle#end()
@@ -250,6 +253,33 @@ if has('win32')
     let g:fugitive_git_executable = "C:\\Users\\e1432179\\AppData\\Local\\Programs\\Git\\cmd\\git.exe"
 endif
 " }}}
+" asynccomplete {{{
+au User call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+    \ 'name': 'buffer',
+    \ 'allowlist': ['*'],
+    \ 'blocklist': ['go'],
+    \ 'completor': function('asyncomplete#sources#buffer#completor'),
+    \ 'config': {
+    \    'max_buffer_size': 5000000,
+    \  },
+    \ }))
+au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+    \ 'name': 'file',
+    \ 'allowlist': ['*'],
+    \ 'priority': 10,
+    \ 'completor': function('asyncomplete#sources#file#completor')
+    \ }))
+
+autocmd User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#omni#get_source_options({
+\ 'name': 'omni',
+\ 'allowlist': ['*'],
+\ 'blocklist': ['c', 'cpp', 'html'],
+\ 'completor': function('asyncomplete#sources#omni#completor'),
+\ 'config': {
+\   'show_source_kind': 1,
+\ },
+\ }))
+" }}}
 " Vim-LSP {{{
 " CCLS language server
 
@@ -265,6 +295,7 @@ function! s:on_lsp_buffer_enabled() abort
     setlocal signcolumn=yes
     if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
     nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gD <plug>(lsp-declaration)
     nmap <buffer> gs <plug>(lsp-document-symbol-search)
     nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
     nmap <buffer> gr :call LspFzf#ReferencesFzf({})<CR>
@@ -283,12 +314,15 @@ if executable('ccls')
       \ 'name': 'ccls',
       \ 'cmd': {server_info->['ccls']},
       \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.ccls'))},
-      \ 'initialization_options': {'cache': {'directory': expand('~/.cache/ccls') }},
+      \ 'initialization_options': {
+        \'cache': {'directory': expand('~/.cache/ccls') },
+        \'index': {"blacklist": ["Test"]}
+      \},
       \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
       \ })
 endif
 
-let g:asyncomplete_auto_popup = 0
+let g:asyncomplete_auto_popup = 1
 function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~ '\s'
@@ -300,6 +334,15 @@ inoremap <silent><expr> <C-n>
   \ asyncomplete#force_refresh()
 inoremap <expr><C-p> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+let g:lsp_settings = {
+\  'clangd': {'disabled': v:true},
+\}
+
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
+
+" for asyncomplete.vim log
+let g:asyncomplete_log_file = expand('~/asyncomplete.log')
 
 " }}}
 " fzf {{{
