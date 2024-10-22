@@ -66,8 +66,7 @@ function! s:handle_location_fzf(ctx, server, type, data) abort "ctx = {counter, 
     let l:expect_keys = join(keys(get(g:, 'fzf_action', s:default_action)), ',')
     call fzf#run(fzf#wrap({'source': l:fzf_list, 'sink*': function('s:handle_sink_fzf'),
                 \'options': ['--multi', '--delimiter', ':', '--preview', l:preview_cmd,
-                \'--expect='.l:expect_keys,
-                \]}))
+                \'--expect='.l:expect_keys, '--preview-window', '+{2}-/2']}))
 endfunction
 
 function! s:list_location_fzf(method, ctx, ...) abort

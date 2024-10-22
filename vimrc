@@ -177,7 +177,14 @@ nnoremap <leader>gd <C-]>
 nnoremap <leader>gD :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
 " FZF ctrl+p
-nmap <C-P> :FZF<CR>
+"nmap <C-P> :FZF<CR>
+"map <expr> <C-p> fugitive#head() != '' ? ':GFiles --cached --others --exclude-standard<CR>' : ':Files<CR>'
+silent! !git rev-parse --is-inside-work-tree
+if v:shell_error == 0
+  noremap <C-p> :GFiles --cached --others --exclude-standard<CR>
+else
+  noremap <C-p> :Files<CR>
+endif
 
 " FZF tagbar
 nmap <leader>] :Tags<CR>
@@ -396,7 +403,8 @@ function! CustomAg(query, ...)
   let command = opts.ag_opts . ' -- ' . fzf#shellescape(query)
   return call('fzf#vim#ag_raw', insert(args, command, 0))
 endfunction
-command! -bang -nargs=* Ag call CustomAg(<q-args>, fzf#vim#with_preview(), <bang>0)
+let preview_cmd = "sh C:/Users/e1432179/vimfiles/fzf-bat-preview.sh {1} {2}"
+command! -bang -nargs=* Ag call CustomAg(<q-args>, {'options': ['--preview', preview_cmd]}, <bang>0)
 
 
 " }}}
