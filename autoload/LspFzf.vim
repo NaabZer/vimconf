@@ -1,13 +1,43 @@
+let s:default_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+function! s:action_for(key, ...)
+  let default = a:0 ? a:1 : ''
+  let Cmd = get(get(g:, 'fzf_action', s:default_action), a:key, default)
+  return Cmd
+endfunction
+
+function! s:format_qf_line(line)
+    let l:split_line = split(a:line, ':')
+    let l:split_name = split (l:split_line[2], '|')
+    let l:split_line = l:split_line[0:1] + l:split_name
+    let l:qf_dict = {'filename': l:split_line[0], 'lnum': l:split_line[1],
+                \ 'col': l:split_line[2], 'text': l:split_line[3]}
+    return l:qf_dict
+endfunction
+
 function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val, "lnum": 1 }'))
+  call setqflist(map(copy(a:lines), 's:format_qf_line(v:val)'))
   copen
   cc
 endfunction
 
 function! s:handle_sink_fzf(lines)
-    if len(a:lines) == 1
+    " First line is command
+    if len(a:lines) == 2 " Open if just one selection
+        let l:key = remove(a:lines, 0)
+        let cmd = s:action_for(l:key, 'e')
         let l:split_line = split(a:lines[0], ':')
-        execute 'edit ' l:split_line[0] . '|' . l:split_line[1]
+        let l:split_name = split(l:split_line[2], '|')
+        echom l:split_line[0:1] + l:split_name
+
+        execute cmd l:split_line[0] . '|' . l:split_line[1]
+    elseif len(a:lines) > 2 " Add to quickfix if several selections
+        let l:key = remove(a:lines, 0)
+        echom a:lines
+        call s:build_quickfix_list(a:lines)
     endif
 endfunction
 
@@ -33,8 +63,11 @@ function! s:handle_location_fzf(ctx, server, type, data) abort "ctx = {counter, 
                     \l:list_item['text'])
     endfor
     let l:preview_cmd = "sh C:/Users/e1432179/vimfiles/fzf-bat-preview.sh {1} {2}"
+    let l:expect_keys = join(keys(get(g:, 'fzf_action', s:default_action)), ',')
     call fzf#run(fzf#wrap({'source': l:fzf_list, 'sink*': function('s:handle_sink_fzf'),
-                \'options': ['--multi', '--delimiter', ':', '--preview', l:preview_cmd]}))
+                \'options': ['--multi', '--delimiter', ':', '--preview', l:preview_cmd,
+                \'--expect='.l:expect_keys,
+                \]}))
 endfunction
 
 function! s:list_location_fzf(method, ctx, ...) abort
