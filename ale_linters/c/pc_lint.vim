@@ -20,10 +20,14 @@ function! ale_linters#c#pc_lint#Handle(buffer, lines) abort
     return l:output
 endfunction
 
+" Create a variable for the path to the editor.lnt which is in this file
+let g:editor_lnt = expand('<sfile>:p:h').'/editor.lnt'
+echom g:editor_lnt
+
 call ale#linter#Define('c', {
 \   'name': 'pc_lint',
 \   'executable': finddir('Tools', getcwd().";").'/Lint/LINT-NT.EXE',
-\   'command': 'LINT-NT.EXE +ffn -v -b std.lnt editor.lnt %s',
+\   'command': 'LINT-NT.EXE +ffn -v -b std.lnt ' . g:editor_lnt . ' %s',
 \   'callback': 'ale_linters#c#pc_lint#Handle',
 \   'cwd': finddir('Tools', getcwd().";").'/Lint',
 \   'output_stream': 'stdout',

@@ -1,0 +1,17 @@
+//+xml(lintoutput.xml)              // Turn on XML escapes
+//-"format=<issue file =\q%f\q line = \q%l\q number = \q%n\q desc = \q%m\q/>"
+//-"format_specific= "
+-hFs1                           // The height of a message should be 1 (i.e. don't output the line in error
+-width(0,0)                     // Don't break long lines
+-"format=%f;%l;%C;%T;%n;%m" 
+
+//-"format=%(%F:%l:%) error %n: (%t -- %m)"     //  Messages will contain
+    //  file information (%F), the line number (%l), the
+    //  message number (%n), message type (%t) and message text (%m).
+
+//-hF2    //  Make sure we ALWAYS provide file information ('F') and use 2
+        //  lines (line in error plus message).
+
+-width(0) //  don't break messages at any particular width
+-t4       //  Presume that tabs are every 4 stops
++libclass(all)

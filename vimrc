@@ -95,6 +95,8 @@ Plugin 'prabirshrestha/asyncomplete-file.vim'
 Plugin 'yami-beta/asyncomplete-omni.vim'
 Plugin 'mattn/vim-lsp-settings'
 
+Plugin 'github/copilot.vim'
+
 call vundle#end()
 " }}}
 filetype plugin indent on
@@ -370,6 +372,7 @@ endfunction
 nmap <silent> <leader>a :set opfunc=AgWithMovement<CR>g@
 vmap <silent> <leader>a :<c-u>call AgWithMovement(visualmode())<CR>
 
+let g:preview_cmd = "bat --color always --highlight-line {2} {1}"
 function! AgWithMovement(type)
     if a:type ==# 'v'
         execute  "normal! `<v`>y"
@@ -394,9 +397,8 @@ function! CustomAg(query, ...)
   let command = opts.ag_opts . ' -- ' . fzf#shellescape(query)
   return call('fzf#vim#ag_raw', insert(args, command, 0))
 endfunction
-let preview_cmd = "bat --color always --highlight-line {2} {1}"
 command! -bang -nargs=* Ag call CustomAg(<q-args>, {'options': ['--preview', 
-            \preview_cmd]}, <bang>0)
+            \g:preview_cmd]}, <bang>0)
 
 " FZF ctrl+p
 "nmap <C-P> :FZF<CR>
