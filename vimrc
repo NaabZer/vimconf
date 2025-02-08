@@ -309,18 +309,25 @@ function! s:on_lsp_buffer_enabled() abort
     " refer to doc to add more commands
 endfunction
 
-if executable('ccls')
-   au User lsp_setup call lsp#register_server({
-      \ 'name': 'ccls',
-      \ 'cmd': {server_info->['ccls']},
-      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.ccls'))},
-      \ 'initialization_options': {
-        \'cache': {'directory': expand('~/.cache/ccls') },
-        \'index': {"blacklist": ["Test"]}
-      \},
-      \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-      \ })
+" Settings used at work when using windows
+if has('win32')
+    if executable('ccls')
+       au User lsp_setup call lsp#register_server({
+          \ 'name': 'ccls',
+          \ 'cmd': {server_info->['ccls']},
+          \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), '.ccls'))},
+          \ 'initialization_options': {
+            \'cache': {'directory': expand('~/.cache/ccls') },
+            \'index': {"blacklist": ["Test"]}
+          \},
+          \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+          \ })
+    endif
 endif
+
+let g:lsp_settings = {
+\  'clangd': {'disabled': v:true},
+\}
 
 let g:asyncomplete_auto_popup = 1
 function! s:check_back_space() abort
@@ -334,9 +341,6 @@ inoremap <silent><expr> <C-n>
   \ asyncomplete#force_refresh()
 inoremap <expr><C-p> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-let g:lsp_settings = {
-\  'clangd': {'disabled': v:true},
-\}
 
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/vim-lsp.log')
