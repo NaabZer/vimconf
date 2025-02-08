@@ -57,7 +57,10 @@ Plugin 'tpope/vim-unimpaired'
 
 "Writing stuff
 Plugin 'lervag/vimtex'
-Plugin 'JamshedVesuna/vim-markdown-preview'
+"Plugin 'JamshedVesuna/vim-markdown-preview'
+Plugin 'iamcco/markdown-preview.nvim'
+Plugin 'godlygeek/tabular'
+Plugin 'preservim/vim-markdown'
 
 "Javascript highligting
 Plugin 'pangloss/vim-javascript'
@@ -211,13 +214,8 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:vimtex_view_method = 'zathura'
 " }}}
 " Vim Markdown {{{
-let vim_markdown_preview_toggle=2
-
-"Use github flavored md if in git repo TODO check if github?
-if system('git rev-parse --is-inside-work-tree')
-    let vim_markdown_preview_github=1
-endif
-let vim_markdown_preview_github=1
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_frontmatter = 1 
 
 " }}}
 " ALE linters{{{ 
@@ -241,7 +239,7 @@ let g:ycm_autoclose_preview_window_after_completion = 1
 
 " }}}
 " Indentline {{{
-let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is not 2 in json and tex
+let g:indentLine_fileTypeExclude = ['json', 'tex', '.md', '.mdx'] " Makes sure conceallevel is not 2 in json and tex
 " }}}
 " Tagbar {{{
 let g:tagbar_sort = 0

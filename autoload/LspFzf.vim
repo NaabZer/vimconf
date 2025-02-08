@@ -62,7 +62,11 @@ function! s:handle_location_fzf(ctx, server, type, data) abort "ctx = {counter, 
                     \l:list_item['col'].'|'.
                     \l:list_item['text'])
     endfor
+if has('win32')
     let l:preview_cmd = "sh C:/Users/e1432179/vimfiles/fzf-bat-preview.sh {1} {2}"
+else
+    let l:preview_cmd = "sh ~/.vim/fzf-bat-preview.sh {1} {2}"
+endif
     let l:expect_keys = join(keys(get(g:, 'fzf_action', s:default_action)), ',')
     call fzf#run(fzf#wrap({'source': l:fzf_list, 'sink*': function('s:handle_sink_fzf'),
                 \'options': ['--multi', '--delimiter', ':', '--preview', l:preview_cmd,
