@@ -16,8 +16,9 @@ endif
 
 Plugin 'gmarik/Vundle.vim'
 
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'rdnetto/YCM-Generator'
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+
+"Plugin 'rdnetto/YCM-Generator'
 
 Plugin 'godlygeek/csapprox'
 
@@ -29,6 +30,7 @@ Plugin 'chriskempson/base16-vim'
 "Plugin 'godlygeek/tabular'
 
 "Plugin 'shawncplus/Vim-toCterm'
+Plugin 'findango/vim-mdx'
 
 "Plugin 'itchyny/lightline.vim'
 Plugin 'vim-airline/vim-airline'
@@ -36,7 +38,7 @@ Plugin 'vim-airline/vim-airline-themes'
 
 "Plugin 'scrooloose/syntastic'
 "Plugin 'w0rp/ale'
-Plugin 'dense-analysis/ale'
+"Plugin 'dense-analysis/ale'
 
 Plugin 'scrooloose/nerdtree'
 Plugin 'jistr/vim-nerdtree-tabs'
@@ -194,6 +196,40 @@ endfunction
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 " }}}
+" COC {{{
+
+" Having longer updatetime (default is 4000 ms = 4s) leads to noticeable
+" delays and poor user experience
+set updatetime=300
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved
+set signcolumn=yes
+
+inoremap <silent><expr> <TAB>
+            \ coc#pum#visible() ? coc#pum#next(1) :
+            \ CheckBackspace() ? "\<Tab>" :
+            \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+"GoTo code navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use <c-space> to trigger completion
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+au FileType html let b:coc_root_patterns = ['.git', '.env', 'tailwind.config.js', 'tailwind.config.cjs']
+
+hi CocMenuSel term=reverse ctermbg=8 "guibg=#2B685E
+
+" }}}
 " vimtex {{{
 let g:vimtex_view_method = 'zathura'
 " Add imap to create \item
@@ -220,17 +256,6 @@ let g:ale_linters = {
             \ 'c' : ['pc_lint'],
             \ 'cpp' : ['pc_lint']
             \}
-" }}}
-" YCM {{{
-let g:ycm_seed_identifiers_with_syntax=1
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-
-" Remove YCM error highlighting, ALE does this.
-let g:ycm_show_diagnostics_ui = 1
-let g:ycm_enable_diagnostic_signs = 0
-let g:ycm_enable_diagnostic_highlighting = 0
-let g:ycm_autoclose_preview_window_after_completion = 1
-
 " }}}
 " Indentline {{{
 let g:indentLine_fileTypeExclude = ['json', 'tex'] " Makes sure conceallevel is not 2 in json and tex

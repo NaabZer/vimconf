@@ -1,0 +1,9 @@
+{
+    "languageserver": {
+        "MDX": {
+            "command": "mdx-language-server",
+            "filetypes": ["md", "mdx"]
+        }
+    },
+    "suggest.noselect": true
+}
