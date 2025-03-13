@@ -45,6 +45,7 @@ Plugin 'mbbill/undotree'
 Plugin 'tpope/vim-fugitive'
 Plugin 'idanarye/vim-merginal'
 Plugin 'Shougo/vimproc.vim'
+Plugin 'mhinz/vim-signify'
 
 Plugin 'yggdroot/indentline'
 
@@ -82,6 +83,9 @@ Plugin 'rhysd/vim-grammarous'
 
 " Python
 Plugin 'jmcantrell/vim-virtualenv'
+
+" C and C++
+Plugin 'bfrg/vim-c-cpp-modern'
 
 " Linting, neccessary for PC-Lint
 Plugin 'dense-analysis/ale'
@@ -128,28 +132,30 @@ let g:airline_theme='base16'
 "            \ } " Change color of lightline to match with colorscheme
 
 "Set bgcolor to terminal color, including transparancy
-let g:CSApprox_hook_post = [
-            \ 'highlight Normal            ctermbg=NONE',
-            \ 'highlight LineNr            ctermbg=NONE',
-            \ 'highlight SignifyLineAdd    cterm=bold ctermbg=NONE ctermfg=green',
-            \ 'highlight SignifyLineDelete cterm=bold ctermbg=NONE ctermfg=red',
-            \ 'highlight SignifyLineChange cterm=bold ctermbg=NONE ctermfg=yellow',
-            \ 'highlight SignifySignAdd    cterm=bold ctermbg=NONE ctermfg=green',
-            \ 'highlight SignifySignDelete cterm=bold ctermbg=NONE ctermfg=red',
-            \ 'highlight SignifySignChange cterm=bold ctermbg=NONE ctermfg=yellow',
-            \ 'highlight SignColumn        ctermbg=NONE',
-            \ 'highlight CursorLine        ctermbg=NONE cterm=NONE',
-            \ 'highlight CursorLineNr      ctermbg=NONE cterm=NONE',
-            \ 'highlight Folded            ctermbg=NONE cterm=bold',
-            \ 'highlight FoldColumn        ctermbg=NONE cterm=bold',
-            \ 'highlight LightlineRight_normal_tabsel_0       ctermbg=NONE cterm=NONE',
-            \ 'highlight NonText           ctermbg=NONE',
-            \ 'highlight SpellCap          ctermbg=NONE',
-            \ 'highlight SpellBad          ctermbg=NONE',
-            \ 'highlight SpellRare         ctermbg=NONE',
-            \ 'highlight SpellLocal        ctermbg=NONE',
-            \ 'highlight clear LineNr'
-            \]
+if !has('gui_running')
+    let g:CSApprox_hook_post = [
+                \ 'highlight Normal            ctermbg=NONE',
+                \ 'highlight LineNr            ctermbg=NONE',
+                \ 'highlight SignifyLineAdd    cterm=bold ctermbg=NONE ctermfg=green',
+                \ 'highlight SignifyLineDelete cterm=bold ctermbg=NONE ctermfg=red',
+                \ 'highlight SignifyLineChange cterm=bold ctermbg=NONE ctermfg=yellow',
+                \ 'highlight SignifySignAdd    cterm=bold ctermbg=NONE ctermfg=green',
+                \ 'highlight SignifySignDelete cterm=bold ctermbg=NONE ctermfg=red',
+                \ 'highlight SignifySignChange cterm=bold ctermbg=NONE ctermfg=yellow',
+                \ 'highlight SignColumn        ctermbg=NONE',
+                \ 'highlight CursorLine        ctermbg=NONE cterm=NONE',
+                \ 'highlight CursorLineNr      ctermbg=NONE cterm=NONE',
+                \ 'highlight Folded            ctermbg=NONE cterm=bold',
+                \ 'highlight FoldColumn        ctermbg=NONE cterm=bold',
+                \ 'highlight LightlineRight_normal_tabsel_0       ctermbg=NONE cterm=NONE',
+                \ 'highlight NonText           ctermbg=NONE',
+                \ 'highlight SpellCap          ctermbg=NONE',
+                \ 'highlight SpellBad          ctermbg=NONE',
+                \ 'highlight SpellRare         ctermbg=NONE',
+                \ 'highlight SpellLocal        ctermbg=NONE',
+                \ 'highlight clear LineNr'
+                \]
+endif
 
 " }}}
 " Indentation {{{
@@ -206,6 +212,29 @@ endfunction
 " Airline {{{
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#branch#format = 2
+"let g:airline_section_y       (fileencoding, fileformat)
+"let g:airline_section_z       (line number)
+let g:airline#extensions#default#section_truncate_width = {
+            \ 'b': 60,
+            \ 'x': 140,
+            \ 'y': 160,
+            \ 'z': 80,
+            \ 'warning': 80,
+            \ 'error': 80,
+            \ }
+let g:airline#extensions#whitespace#enabled = 0
+
+function! Lnnr()
+    return line('.') . '/' . line('$')
+endfunction
+
+function! AirlineInit()
+    call airline#parts#define_function('lnnr', 'Lnnr')
+    "let g:airline_section_y = airline#section#create(['ffenc'])
+    let g:airline_section_z = airline#section#create(['lnnr'])
+endfunction
+autocmd User AirlineAfterInit call AirlineInit()
 " }}}
 " vimtex {{{
 let g:vimtex_view_method = 'zathura'
@@ -220,7 +249,7 @@ endif
 let vim_markdown_preview_github=1
 
 " }}}
-" ALE linters{{{ 
+" ALE linters{{{
 let g:ale_linters = {
             \ 'cs': ['OmniSharp'],
             \ 'c' : ['pc_lint'],
@@ -305,7 +334,7 @@ function! s:on_lsp_buffer_enabled() abort
 
     let g:lsp_format_sync_timeout = 1000
     autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
-    
+
     " refer to doc to add more commands
 endfunction
 
@@ -329,7 +358,7 @@ let g:lsp_settings = {
 \  'clangd': {'disabled': v:true},
 \}
 
-let g:asyncomplete_auto_popup = 1
+let g:asyncomplete_auto_popup = 0
 function! s:check_back_space() abort
     let col = col('.') - 1
     return !col || getline('.')[col - 1]  =~ '\s'
@@ -401,7 +430,7 @@ function! CustomAg(query, ...)
   let command = opts.ag_opts . ' -- ' . fzf#shellescape(query)
   return call('fzf#vim#ag_raw', insert(args, command, 0))
 endfunction
-command! -bang -nargs=* Ag call CustomAg(<q-args>, {'options': ['--preview', 
+command! -bang -nargs=* Ag call CustomAg(<q-args>, {'options': ['--preview',
             \g:preview_cmd]}, <bang>0)
 
 " FZF ctrl+p
@@ -457,7 +486,7 @@ autocmd StdinReadPre * let  s:std_in=1
 autocmd vimenter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " Move in windows with C-<dir> instead of C-w <dir>
-map <C-h> <C-w>h  
+map <C-h> <C-w>h
 map <C-l> <C-w>l
 map <C-j> <C-w>j
 map <C-k> <C-w>k
