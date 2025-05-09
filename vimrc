@@ -90,6 +90,10 @@ Plugin 'bfrg/vim-c-cpp-modern'
 " Linting, neccessary for PC-Lint
 Plugin 'dense-analysis/ale'
 
+" Make folds faster
+Plugin 'Konfekt/FastFold'
+Plugin 'tmhedberg/SimpylFold'
+
 " LSP
 Plugin 'prabirshrestha/vim-lsp'
 Plugin 'prabirshrestha/asyncomplete.vim'
@@ -504,8 +508,25 @@ set incsearch " Search while entering word
 set foldenable " Enable folding
 set foldlevelstart=10 " Open most folds upon start
 " set foldmethod=indent 
-set foldmethod=syntax " Fold based on syntax
 set foldnestmax=10 " Maximum of 10 nested folds
+let g:markdown_folding = 1
+let g:rst_fold_enabled = 1
+let g:tex_fold_enabled = 1
+let g:vimsyn_folding = 'af'
+let g:xml_syntax_folding = 1
+let g:javaScript_fold = 1
+let g:sh_fold_enabled= 7
+let g:zsh_fold_enable = 1
+let g:ruby_fold = 1
+let g:perl_fold = 1
+let g:perl_fold_blocks = 1
+let g:r_syntax_folding = 1
+let g:rust_fold = 1
+let g:php_folding = 1
+let g:fortran_fold=1
+let g:clojure_fold = 1
+let g:baan_fold=1
+autocmd FileType c,cpp setlocal foldmethod=syntax
 " }}}
 " Quality of Life {{{
 set cursorline " Make current line stand out
