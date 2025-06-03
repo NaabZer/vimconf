@@ -206,12 +206,27 @@ endfunction
 
 " }}}
 " Plugin settings {{{
+" Nerdtree {{{
+autocmd vimenter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | call feedkeys(":quit\<CR>:\<BS>") | endif
+
+" }}}
 " Airline {{{
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 " }}}
 " vimtex {{{
 let g:vimtex_view_method = 'zathura'
+call vimtex#imaps#add_map({
+    \ 'lhs' : 'I',
+    \ 'rhs' : '\item ',
+    \ 'wrapper' : 'vimtex#imaps#wrap_trivial'
+    \})
+
+au Filetype tex imap <C-b> \begin{}<left>
+au Filetype tex imap <C-e> \emph{}<left>
+au Filetype tex imap <C-f> \textbf{}<left>
 " }}}
 " Vim Markdown {{{
 let g:vim_markdown_conceal = 0
@@ -226,17 +241,6 @@ let g:ale_linters = {
             \}
 let g:ale_disable_lsp = 1
 let g:ale_open_list = 1
-" }}}
-" YCM {{{
-let g:ycm_seed_identifiers_with_syntax=1
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-
-" Remove YCM error highlighting, ALE does this.
-let g:ycm_show_diagnostics_ui = 1
-let g:ycm_enable_diagnostic_signs = 0
-let g:ycm_enable_diagnostic_highlighting = 0
-let g:ycm_autoclose_preview_window_after_completion = 1
-
 " }}}
 " Indentline {{{
 let g:indentLine_fileTypeExclude = ['json', 'tex', '.md', '.mdx'] " Makes sure conceallevel is not 2 in json and tex
@@ -325,6 +329,7 @@ endif
 
 let g:lsp_settings = {
 \  'clangd': {'disabled': v:true},
+\  'digestif': {'disabled': v:true},
 \}
 
 let g:asyncomplete_auto_popup = 1
@@ -452,7 +457,6 @@ set nolist " List fucks wrapping up, so lets disable it
 "TODO: Make movement with wraps not retarded
 
 autocmd StdinReadPre * let  s:std_in=1
-autocmd vimenter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " Move in windows with C-<dir> instead of C-w <dir>
 map <C-h> <C-w>h  
@@ -540,8 +544,8 @@ au Filetype vim set foldlevel=0 " Start with everything folded in vimrc
 au Filetype tex set linebreak " Don't linebreak in the middle of a word, only certain characters (Can be configured IIRC)
 au Filetype tex set nowrap " Don't wrap across lines, break the line instead, tex doesn't care if there's only one linebreak
 au Filetype tex set tw=80 " Don't let a line exceed 80 characters
-au Filetype tex map <C-b> i\begin{}<left>
-au Filetype tex imap <C-b> \begin{}<left>
+
+au Filetype py set foldmethod=indent 
 
 " frontend dev uses to many tabs for a 4 space tab
 au Filetype html,javascript,jsx setlocal shiftwidth=2
