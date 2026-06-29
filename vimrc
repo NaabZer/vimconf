@@ -106,7 +106,7 @@ Plugin 'prabirshrestha/asyncomplete-file.vim'
 Plugin 'yami-beta/asyncomplete-omni.vim'
 Plugin 'mattn/vim-lsp-settings'
 
-Plugin 'github/copilot.vim'
+"Plugin 'github/copilot.vim'
 
 call vundle#end()
 " }}}
@@ -412,7 +412,7 @@ endfunction
 nmap <silent> <leader>a :set opfunc=AgWithMovement<CR>g@
 vmap <silent> <leader>a :<c-u>call AgWithMovement(visualmode())<CR>
 
-let g:preview_cmd = "bat --color always --highlight-line {2} {1}"
+let g:preview_cmd = "batcat --color always --highlight-line {2} {1}"
 function! AgWithMovement(type)
     if a:type ==# 'v'
         execute  "normal! `<v`>y"
@@ -443,9 +443,9 @@ command! -bang -nargs=* Ag call CustomAg(<q-args>, {'options': ['--preview',
 " FZF ctrl+p
 "nmap <C-P> :FZF<CR>
 command! -bang -nargs=? GFiles call fzf#vim#gitfiles(<q-args>, {'options':[
-            \'--preview', 'bat --color always {1}']}, <bang>0)
+            \'--preview', 'batcat --color always {1}']}, <bang>0)
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, {'options':[
-            \'--preview', 'bat --color always {1}']}, <bang>0)
+            \'--preview', 'batcat --color always {1}']}, <bang>0)
 map <expr> <C-p> FugitiveHead() != '' ? ':GFiles --cached --others --exclude-standard<CR>' : ':Files<CR>'
 "silent! !git rev-parse --is-inside-work-tree
 "if v:shell_error == 0

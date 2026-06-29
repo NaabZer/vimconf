@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -eEuCo pipefail
 
@@ -15,4 +15,4 @@ fi
 declare -i -r start=$(( line - center ))
 declare -i -r end=$(( lines + start ))
 
-exec bat --color always --highlight-line $line "$file"
+exec batcat --color always --highlight-line $line "$file"
