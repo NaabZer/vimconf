@@ -10,7 +10,8 @@ return {
       local function transparent()
         for _, g in ipairs({
           "Normal", "NormalNC", "SignColumn", "LineNr",
-          "CursorLine", "CursorLineNr", "Folded", "FoldColumn", "NonText",
+          "Folded", "FoldColumn", "NonText",
+          "TroubleNormal", "TroubleNormalNC",
         }) do
           vim.api.nvim_set_hl(0, g, { bg = "none" })
         end

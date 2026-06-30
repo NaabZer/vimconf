@@ -14,3 +14,12 @@ map("n", "<C-Up>",    "<cmd>resize +2<cr>")
 map("n", "<C-Down>",  "<cmd>resize -2<cr>")
 map("n", "<C-Left>",  "<cmd>vertical resize -2<cr>")
 map("n", "<C-Right>", "<cmd>vertical resize +2<cr>")
+
+-- Diagnostics: ]d/[d (all severities) are Neovim defaults; ]e/[e jump errors only.
+local function diag_jump_error(count)
+  return function()
+    vim.diagnostic.jump({ count = count, severity = vim.diagnostic.severity.ERROR })
+  end
+end
+map("n", "]e", diag_jump_error(1),  { desc = "Next error" })
+map("n", "[e", diag_jump_error(-1), { desc = "Prev error" })
