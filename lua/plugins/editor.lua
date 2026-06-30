@@ -10,6 +10,9 @@ return {
     -- (ys/cs/ds + visual S are unaffected); only replaces vanilla s=substitute (use cl).
     keys = {
       { "s", function() require("flash").jump() end, mode = { "n", "x", "o" }, desc = "Flash jump" },
+      -- S in n/o only (NOT visual x) so vim-surround's visual-mode S (wrap selection) is preserved.
+      { "S", function() require("flash").treesitter() end, mode = { "n", "o" }, desc = "Flash Treesitter" },
+      { "<C-s>", function() require("flash").toggle() end, mode = { "c" }, desc = "Toggle Flash Search" },
     },
   },
   { "kevinhwang91/nvim-ufo", dependencies = { "kevinhwang91/promise-async" },
