@@ -23,3 +23,15 @@ local function diag_jump_error(count)
 end
 map("n", "]e", diag_jump_error(1),  { desc = "Next error" })
 map("n", "[e", diag_jump_error(-1), { desc = "Prev error" })
+
+-- Commenting: gc/gcc are built into Neovim (>=0.10) — no plugin needed.
+
+-- Nr2Bin / <leader>h: echo the binary representation of the number under a motion or
+-- visual selection (the "fun" utility). Logic in lua/nr2bin.lua (operatorfunc module).
+map("n", "<leader>h", function()
+  vim.o.operatorfunc = "v:lua.require'nr2bin'.opfunc"
+  return "g@"
+end, { expr = true, desc = "Echo binary of number (motion)" })
+map("x", "<leader>h", function()
+  require("nr2bin").opfunc(vim.fn.visualmode())
+end, { desc = "Echo binary of number (selection)" })

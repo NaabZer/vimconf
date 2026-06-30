@@ -54,3 +54,7 @@ o.foldlevelstart = 99
 
 -- Tags
 o.tags = "./tags;/"
+
+-- Project-local config (replaces vim-projectlocal). Neovim sandboxes & prompts to
+-- trust project-local .nvim.lua/.exrc files.
+o.exrc = true
