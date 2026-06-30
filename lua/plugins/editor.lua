@@ -1,5 +1,17 @@
 return {
-  { "folke/flash.nvim", event = "VeryLazy", opts = {} },  -- enhances f/F/t/T automatically; s/S/r/R are opt-in (not mapped) so vim-surround's visual S and s=substitute are preserved
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- show jump labels on f/F/t/T so you can pick any match (not just the next)
+      modes = { char = { jump_labels = true } },
+    },
+    -- s = flash jump (type chars -> labels -> teleport). Safe with vim-surround
+    -- (ys/cs/ds + visual S are unaffected); only replaces vanilla s=substitute (use cl).
+    keys = {
+      { "s", function() require("flash").jump() end, mode = { "n", "x", "o" }, desc = "Flash jump" },
+    },
+  },
   { "kevinhwang91/nvim-ufo", dependencies = { "kevinhwang91/promise-async" },
     event = "BufReadPost",
     init = function() vim.o.foldlevel = 99; vim.o.foldlevelstart = 99; vim.o.foldenable = true end,
