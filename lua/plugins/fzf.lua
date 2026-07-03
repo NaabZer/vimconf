@@ -75,6 +75,24 @@ return {
         end
       end, { bang = true, desc = "fzf files (! = include ignored+hidden)" })
 
+      -- :Ag [pattern]  -> grep respecting .gitignore (rg). :Ag! [pattern] -> all files
+      -- (--no-ignore --hidden). No arg -> interactive live grep. Both exclude .claude/worktrees
+      -- (rg -g glob applies even under --no-ignore). Backend is ripgrep.
+      vim.api.nvim_create_user_command("Ag", function(o)
+        local base = fzf.config.globals.grep.rg_opts
+        local gopts = { rg_opts = base .. [[ -g "!**/.claude/worktrees/**"]] }
+        if o.bang then
+          gopts.no_ignore = true
+          gopts.hidden = true
+        end
+        if o.args ~= "" then
+          gopts.search = o.args
+          fzf.grep(gopts)
+        else
+          fzf.live_grep(gopts)
+        end
+      end, { bang = true, nargs = "*", desc = "Grep project (fzf-lua); ! = all files; excludes .claude/worktrees" })
+
       -- <leader>]: repo-wide LSP workspace symbols (definitions/symbols across the project).
       -- Replaces the old ctags :Tags picker now that built-in LSP is in place.
       -- (gS is also bound to this in lsp.lua's LspAttach; <leader>] gives a non-buffer-local entry point.)
