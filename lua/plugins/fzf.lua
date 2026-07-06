@@ -80,7 +80,10 @@ return {
       -- (rg -g glob applies even under --no-ignore). Backend is ripgrep.
       vim.api.nvim_create_user_command("Ag", function(o)
         local base = fzf.config.globals.grep.rg_opts
-        local gopts = { rg_opts = base .. [[ -g "!**/.claude/worktrees/**"]] }
+        -- Prepend the exclude glob so it lands BEFORE the trailing `-e` in rg_opts.
+        -- fzf-lua appends the search pattern right after `-e`; a `-g` glob placed AFTER
+        -- `-e` is mis-parsed by rg (treated as a path) and the exclusion silently fails.
+        local gopts = { rg_opts = [[-g "!**/.claude/worktrees/**" ]] .. base }
         if o.bang then
           gopts.no_ignore = true
           gopts.hidden = true
