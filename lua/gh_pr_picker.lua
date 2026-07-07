@@ -72,10 +72,13 @@ end
 -- from the slack-review-query CLI). Each line is "<url>\t<display>"; the
 -- display half (the Rich-rendered ANSI text) is shown while the URL stays
 -- hidden, and the URL drives both the preview and the actions below.
--- <CR>     → open selected PR in an octo buffer, by URL (cross-repo-correct)
+-- <CR>     → open the English-translated preview (slack-review-query --preview)
+--            in a terminal buffer, replacing the current buffer
+-- <C-o>    → open selected PR in an octo buffer, by URL (cross-repo-correct)
 -- <C-r>    → open selected PR in an isolated git worktree (:PRReview <n>)
 --            NOTE: pr_review.review() operates on the current repo, so this
 --            is only correct when nvim is inside the PR's own repo.
+-- <C-t>    → toggle to the by-author (repo) picker
 function M.tagged()
   if not has_query() then
     vim.notify("slack-review-query not found (install the poller)", vim.log.levels.WARN)
@@ -91,8 +94,17 @@ function M.tagged()
     },
     preview = "slack-review-query --preview {1}",
     actions = {
-      -- default (Enter): open the PR in an octo buffer by URL (cross-repo-correct).
+      -- default (Enter): open the English-translated preview (same content as the
+      -- fzf preview pane) in a terminal buffer so the Rich ANSI renders; replaces
+      -- the current buffer.
       ["default"] = function(selected)
+        local url = parse_url(selected and selected[1])
+        if not url then return end
+        vim.cmd.enew()
+        vim.fn.jobstart({ "slack-review-query", "--preview", url }, { term = true })
+      end,
+      -- ctrl-o: open the PR in an octo buffer by URL (cross-repo-correct).
+      ["ctrl-o"] = function(selected)
         local url = parse_url(selected and selected[1])
         if url then vim.cmd("Octo " .. url) end
       end,
