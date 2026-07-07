@@ -12,7 +12,22 @@ return {
       "DiffviewToggleFiles",
       "DiffviewFocusFiles",
     },
-    opts = {},
+    opts = function()
+      local actions = require("diffview.actions")
+      local nav = {
+        { "n", "<tab>",   false },  -- restore <C-i> (jumplist-forward) inside diffview
+        { "n", "<s-tab>", false },  -- restore Shift-Tab
+        { "n", "]f", actions.select_next_entry, { desc = "Next changed file" } },
+        { "n", "[f", actions.select_prev_entry, { desc = "Prev changed file" } },
+      }
+      return {
+        keymaps = {
+          view               = nav,
+          file_panel         = nav,
+          file_history_panel = nav,
+        },
+      }
+    end,
     init = function()
       require("pr_review").register()
     end,
