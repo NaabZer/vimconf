@@ -68,12 +68,41 @@ local function parse_url(line)
   return line and line:match("^(%S+)")
 end
 
+-- Render the English-translated markdown preview (slack-review-query --markdown
+-- --preview) for a PR URL into a read-only markdown scratch buffer, replacing
+-- the current buffer. A normal buffer (not a terminal) survives cursor movement
+-- and other input.
+local function open_markdown_preview(url)
+  local res = vim.system(
+    { "slack-review-query", "--markdown", "--preview", url },
+    { text = true }
+  ):wait()
+  if res.code ~= 0 then
+    vim.notify(
+      "slack-review-query --preview failed:\n" .. ((res.stderr or ""):gsub("%s+$", "")),
+      vim.log.levels.ERROR
+    )
+    return
+  end
+  local lines = vim.split(res.stdout or "", "\n")
+  if lines[#lines] == "" then table.remove(lines) end -- drop trailing blank line
+  vim.cmd.enew() -- replace the current buffer (hidden=true → safe)
+  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].filetype = "markdown"
+  vim.bo[buf].buftype = "nofile"
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].swapfile = false
+  vim.bo[buf].modifiable = false
+  vim.bo[buf].modified = false
+end
+
 -- Open an fzf-lua picker listing PRs tagged for review via Slack (sourced
 -- from the slack-review-query CLI). Each line is "<url>\t<display>"; the
 -- display half (the Rich-rendered ANSI text) is shown while the URL stays
 -- hidden, and the URL drives both the preview and the actions below.
 -- <CR>     → open the English-translated preview (slack-review-query --preview)
---            in a terminal buffer, replacing the current buffer
+--            as markdown in a read-only scratch buffer, replacing the current buffer
 -- <C-o>    → open selected PR in an octo buffer, by URL (cross-repo-correct)
 -- <C-r>    → open selected PR in an isolated git worktree (:PRReview <n>)
 --            NOTE: pr_review.review() operates on the current repo, so this
@@ -94,14 +123,11 @@ function M.tagged()
     },
     preview = "slack-review-query --preview {1}",
     actions = {
-      -- default (Enter): open the English-translated preview (same content as the
-      -- fzf preview pane) in a terminal buffer so the Rich ANSI renders; replaces
-      -- the current buffer.
+      -- default (Enter): render the English markdown preview in a read-only scratch
+      -- buffer (survives input, unlike a terminal buffer).
       ["default"] = function(selected)
         local url = parse_url(selected and selected[1])
-        if not url then return end
-        vim.cmd.enew()
-        vim.fn.jobstart({ "slack-review-query", "--preview", url }, { term = true })
+        if url then open_markdown_preview(url) end
       end,
       -- ctrl-o: open the PR in an octo buffer by URL (cross-repo-correct).
       ["ctrl-o"] = function(selected)
