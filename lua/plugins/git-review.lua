@@ -1,6 +1,6 @@
 return {
   -- diffview.nvim: side-by-side diff viewer and file-history browser.
-  -- init() registers :PRReview/:PRReviewDone at startup (before any lazy-load)
+  -- init() registers :PRReview / :PRReviewClean at startup (before any lazy-load)
   -- so the commands are always available even before diffview itself loads.
   {
     "sindrets/diffview.nvim",
