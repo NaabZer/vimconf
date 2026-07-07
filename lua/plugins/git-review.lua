@@ -55,7 +55,7 @@ return {
     keys = {
       { "<leader>gp", "<cmd>Octo pr list<cr>",                                       desc = "PR list" },
       { "<leader>gi", "<cmd>Octo issue list<cr>",                                    desc = "Issue list" },
-      { "<leader>gP", function() require("gh_pr_picker").by_author() end,            desc = "PRs by author (fzf)" },
+      { "<leader>gP", function() require("gh_pr_picker").tagged() end,            desc = "Review PRs (Slack queue; <C-t> repo)" },
     },
   },
 }

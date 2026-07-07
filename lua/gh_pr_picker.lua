@@ -49,6 +49,8 @@ function M.by_author()
         local n = parse_number(selected and selected[1])
         if n then require("pr_review").review(tonumber(n)) end
       end,
+      -- ctrl-t: toggle to the tagged (Slack-queue) picker.
+      ["ctrl-t"] = function() M.tagged() end,
     },
   })
 end
@@ -101,6 +103,8 @@ function M.tagged()
         local n = url and url:match("/pull/(%d+)")
         if n then require("pr_review").review(tonumber(n)) end
       end,
+      -- ctrl-t: toggle to the by-author (repo) picker.
+      ["ctrl-t"] = function() M.by_author() end,
     },
   })
 end
