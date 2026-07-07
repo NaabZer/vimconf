@@ -202,6 +202,23 @@ function M.review(n)
     )
   end
 
+  -- Refresh the base branch so the merge-base matches GitHub's. gh pr checkout
+  -- only fetches the PR branch, so the local origin/<base> ref may be stale; a
+  -- stale base makes the three-dot merge-base land too far back and pulls in
+  -- commits from OTHER PRs already merged into the base. Best-effort: on failure
+  -- we warn and diff against whatever origin/<base> currently points to.
+  local _, ferr, fcode = run(
+    { "git", "-C", dir, "fetch", "origin", base },
+    { timeout = 60000 }
+  )
+  if fcode ~= 0 then
+    vim.notify(
+      "pr_review: could not fetch origin/" .. base ..
+      " (diff may include changes from other merged PRs):\n" .. trim(ferr),
+      vim.log.levels.WARN
+    )
+  end
+
   -- Open a new tab, pin its cwd to the worktree, then open the diff.
   -- --imply-local: makes the working-tree files the right-hand side of the diff
   -- so Neovim LSP attaches to real on-disk files (not to git blob objects).
