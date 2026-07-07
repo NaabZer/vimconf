@@ -95,6 +95,10 @@ local function open_markdown_preview(url)
   vim.bo[buf].swapfile = false
   vim.bo[buf].modifiable = false
   vim.bo[buf].modified = false
+  -- render-markdown.nvim is disabled globally (opts.enabled=false); enable it
+  -- for just this preview buffer. pcall so a missing/not-yet-loaded plugin never
+  -- breaks the preview.
+  pcall(vim.cmd, "RenderMarkdown buf_enable")
 end
 
 -- Open an fzf-lua picker listing PRs tagged for review via Slack (sourced
