@@ -20,6 +20,7 @@ return {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Diff view (working tree)" },
       { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
       { "<leader>gH", "<cmd>DiffviewFileHistory<cr>",   desc = "Repo history" },
+      { "<leader>gc", "<cmd>DiffviewClose<cr>",         desc = "Close diff view" },
     },
   },
 
@@ -37,8 +38,9 @@ return {
     cmd = "Octo",
     opts = { picker = "fzf-lua" },
     keys = {
-      { "<leader>gp", "<cmd>Octo pr list<cr>",    desc = "PR list" },
-      { "<leader>gi", "<cmd>Octo issue list<cr>", desc = "Issue list" },
+      { "<leader>gp", "<cmd>Octo pr list<cr>",                                       desc = "PR list" },
+      { "<leader>gi", "<cmd>Octo issue list<cr>",                                    desc = "Issue list" },
+      { "<leader>gP", function() require("gh_pr_picker").by_author() end,            desc = "PRs by author (fzf)" },
     },
   },
 }

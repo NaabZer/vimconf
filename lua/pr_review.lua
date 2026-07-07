@@ -22,17 +22,20 @@ local function trim(s)
   return (s:gsub("%s+$", ""))
 end
 
--- Return the absolute git repo root for the current cwd, or nil on error.
-local function repo_root()
-  local out, err, code = run({ "git", "rev-parse", "--show-toplevel" })
+-- Absolute path of the MAIN worktree (first entry of `git worktree list --porcelain`),
+-- regardless of which linked worktree we're currently in. Returns nil on error.
+local function main_root()
+  local out, err, code = run({ "git", "worktree", "list", "--porcelain" })
   if code ~= 0 then
-    vim.notify(
-      "pr_review: not inside a git repo: " .. trim(err),
-      vim.log.levels.ERROR
-    )
+    vim.notify("pr_review: not inside a git repo: " .. trim(err), vim.log.levels.ERROR)
     return nil
   end
-  return trim(out)
+  local first = out:match("^worktree (.-)\n")
+  if not first or first == "" then
+    vim.notify("pr_review: could not determine main worktree", vim.log.levels.ERROR)
+    return nil
+  end
+  return first
 end
 
 -- Compute the worktree directory for PR n.
@@ -51,7 +54,7 @@ function M.review(n)
     return
   end
 
-  local root = repo_root()
+  local root = main_root()
   if not root then return end
 
   local dir = worktree_dir(root, n)
@@ -84,14 +87,39 @@ function M.review(n)
       { cwd = dir, timeout = 120000 }
     )
     if code2 ~= 0 then
-      -- Remove the half-initialised worktree to avoid leaving debris.
-      run({ "git", "-C", root, "worktree", "remove", "--force", dir })
-      vim.notify(
-        "pr_review: gh pr checkout " .. n .. " failed:\n" .. trim(err2) ..
-        "\n(Is gh authenticated? Does the PR exist?)",
-        vim.log.levels.ERROR
+      -- Fallback for closed/merged PRs whose branch was deleted: the PR head still
+      -- lives at refs/pull/<n>/head. Fetch it and detach onto it (read-only review).
+      local _, ferr, fcode = run(
+        { "git", "-C", dir, "fetch", "origin", ("refs/pull/%d/head"):format(n) },
+        { timeout = 120000 }
       )
-      return
+      if fcode ~= 0 then
+        run({ "git", "-C", root, "worktree", "remove", "--force", dir })
+        vim.notify(
+          "pr_review: could not check out PR " .. n ..
+          " (branch may be deleted and pull ref unavailable):\n" ..
+          trim(err2) .. "\n" .. trim(ferr),
+          vim.log.levels.ERROR
+        )
+        return
+      end
+
+      local _, cerr, ccode = run(
+        { "git", "-C", dir, "checkout", "--detach", "FETCH_HEAD" }
+      )
+      if ccode ~= 0 then
+        run({ "git", "-C", root, "worktree", "remove", "--force", dir })
+        vim.notify(
+          "pr_review: fetched pull/" .. n .. "/head but checkout --detach failed:\n" .. trim(cerr),
+          vim.log.levels.ERROR
+        )
+        return
+      end
+
+      vim.notify(
+        "pr_review: PR #" .. n .. " branch not available; reviewing pull/" .. n .. "/head (detached, read-only).",
+        vim.log.levels.INFO
+      )
     end
   end
 
@@ -144,7 +172,7 @@ function M.done(n)
     return
   end
 
-  local root = repo_root()
+  local root = main_root()
   if not root then return end
 
   local dir = worktree_dir(root, n)
@@ -194,7 +222,7 @@ function M.register()
     local n = tonumber(o.args)
     if not n then
       vim.notify(
-        "PRReview: expected a numeric PR number, got: " .. o.args,
+        "pr_review: PRReview expected a numeric PR number, got: " .. o.args,
         vim.log.levels.WARN
       )
       return
@@ -206,7 +234,7 @@ function M.register()
     local n = tonumber(o.args)
     if not n then
       vim.notify(
-        "PRReviewDone: expected a numeric PR number, got: " .. o.args,
+        "pr_review: PRReviewDone expected a numeric PR number, got: " .. o.args,
         vim.log.levels.WARN
       )
       return
