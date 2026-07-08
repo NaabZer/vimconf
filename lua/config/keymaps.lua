@@ -26,6 +26,13 @@ map("n", "[e", diag_jump_error(-1), { desc = "Prev error" })
 
 -- Commenting: gc/gcc are built into Neovim (>=0.10) — no plugin needed.
 
+-- Terminal mode escapes. Both run <C-\><C-n> internally, so they work even though
+-- Alacritty swallows a literal Ctrl+\. <C-o> drops to normal mode in place; <C-f>
+-- escapes and jumps back to the previous window (Claude pane stays visible),
+-- mirroring <leader>cf (:ClaudeCodeFocus) as the "focus back to code" direction.
+map("t", "<C-o>", [[<C-\><C-n>]])
+map("t", "<C-f>", [[<C-\><C-n><C-w>p]])
+
 -- Nr2Bin / <leader>h: echo the binary representation of the number under a motion or
 -- visual selection (the "fun" utility). Logic in lua/nr2bin.lua (operatorfunc module).
 map("n", "<leader>h", function()
