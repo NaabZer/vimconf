@@ -34,7 +34,7 @@ return {
         -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
         ---@module 'render-markdown'
         ---@type render.md.UserConfig
-        opts = {},
+        opts = { enabled = false },
     },
     { "tpope/vim-surround",     dependencies = { "tpope/vim-repeat" }, event = "VeryLazy" },
     { "tpope/vim-unimpaired",   event = "VeryLazy" },

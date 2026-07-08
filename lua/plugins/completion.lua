@@ -16,8 +16,8 @@ return {
         event = "InsertEnter",
         opts = {
             keymap = { preset = "default" }, -- <C-n>/<C-p> navigate, <C-y> accept, <C-space> show; <CR> stays a literal newline
-            sources = { 
-                default = { "lazydev", "lsp", "path", "snippets", "buffer" } ,
+            sources = {
+                default = { "lazydev", "lsp", "path", "snippets", "buffer" },
                 providers = {
                     lazydev = {
                         name = "LazyDev",
