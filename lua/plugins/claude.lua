@@ -44,9 +44,10 @@ return {
         },
     },
     {
-        dir = "~/develop/nvim-claude-assistant",
+        --dir = "~/develop/nvim-claude-assistant",
+        dir = "~/develop/nvim-claude-assistant/.claude/worktrees/command-expansions/",
         dependencies = {
-            { dir = "~/develop/claudecode.nvim" },
+            { "coder/claudecode.nvim" },
         },
         -- Load when you first reach for it (any command or the default keymaps).
         cmd = { "ClaudeAssistantReview", "ClaudeAssistantExplain", "ClaudeAssistantPaste" },
